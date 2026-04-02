@@ -4,7 +4,7 @@ on:
   # 每天 UTC 时间 04:00 运行
   schedule:
     - cron: '0 4 * * *'
-  
+
   # 允许手动触发 (无需输入参数，直接构建最新版)
   workflow_dispatch:
 
@@ -12,7 +12,7 @@ env:
   REGISTRY_DOCKERHUB: docker.io
   REGISTRY_GHCR: ghcr.io
   # 替换为你的 Docker Hub 用户名
-  IMAGE_NAME_DOCKERHUB: ${{ secrets.DOCKER_USERNAME }}/openclaw 
+  IMAGE_NAME_DOCKERHUB: ${{ secrets.DOCKER_USERNAME }}/openclaw
   IMAGE_NAME_GHCR: ${{ github.repository }}
 
 jobs:
@@ -41,22 +41,22 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           SHOULD_BUILD="false"
-          
+
           # 无论是定时还是手动，逻辑统一：获取最新 Release
           echo "Fetching latest release from openclaw/openclaw..."
-          
+
           # 获取 openclaw/openclaw 仓库的最新 Release 标题
           # 假设标题格式为 "openclaw 2026.4.1"
           LATEST_RELEASE_JSON=$(gh api repos/openclaw/openclaw/releases/latest)
           VERSION=$(echo "$LATEST_RELEASE_JSON" | jq -r '.name | split(" ")[1]')
-          
+
           if [ -z "$VERSION" ] || [ "$VERSION" == "null" ]; then
             echo "Error: Could not parse version from release name."
             exit 1
           fi
-          
+
           echo "Latest version found: ${VERSION}"
-          
+
           # 检查本地仓库是否已经存在该版本的标签 (格式: v-版本号)
           # 如果标签已存在，说明之前已经构建过，直接跳过
           if git ls-remote --tags origin | grep -q "refs/tags/v-${VERSION}$"; then

@@ -30,4 +30,5 @@ RUN set -x && \
 EXPOSE 18789
 VOLUME /root/.openclaw
 
-CMD ["openclaw", "gateway"]
+# --allow-unconfigured：无配置文件时使用默认配置
+CMD ["openclaw", "gateway", "--allow-unconfigured"]
