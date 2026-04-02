@@ -18,6 +18,7 @@ RUN set -x && \
 RUN set -x && \
     curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | \
     bash -s -- --no-prompt --no-onboard -v ${OPENCLAW_VERSION} && \
+    openclaw doctor --fix && \
     rm -rf /root/.npm
 
 EXPOSE 18789
