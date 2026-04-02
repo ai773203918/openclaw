@@ -31,7 +31,7 @@ jobs:
         with:
           fetch-depth: 0 # 获取所有历史记录，用于检查标签
 
-      # ==========================================
+            # ==========================================
       # 步骤 1: 确定版本号 & 检查是否已构建
       # ==========================================
       - name: 确定版本并检查构建状态
@@ -57,10 +57,9 @@ jobs:
 
           echo "Latest version found: ${VERSION}"
 
-          # 检查本地仓库是否已经存在该版本的标签 (格式: v-版本号)
-          # 如果标签已存在，说明之前已经构建过，直接跳过
-          # 👇 关键修改：如果当前是手动触发 (workflow_dispatch)，则不执行 if 块内的跳过逻辑，直接设置 SHOULD_BUILD=true
+          # 如果是手动触发，强制构建=
           if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            # --- 定时触发模式：检查标签 ---
             if git ls-remote --tags origin | grep -q "refs/tags/v-${VERSION}$"; then
               echo "Version ${VERSION} is already built (tag v-${VERSION} exists). Skipping."
             else
@@ -68,7 +67,7 @@ jobs:
               SHOULD_BUILD="true"
             fi
           else
-            # 👇 手动触发强制构建
+            # --- 手动触发模式：忽略检查，直接构建 ---
             echo "Workflow dispatched. Force building version ${VERSION} regardless of existing tags."
             SHOULD_BUILD="true"
           fi
@@ -146,7 +145,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           # 👇 关键修改：如果标签已存在，强制更新 (-f)
           git tag -fa "v-${{ steps.check_version.outputs.VERSION }}" -m "Build OpenClaw version ${{ steps.check_version.outputs.VERSION }}"
           # 推送标签时也使用 --force
